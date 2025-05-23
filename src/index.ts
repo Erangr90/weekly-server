@@ -7,7 +7,7 @@ import { connectToDb } from "./config/db";
 import dotenv from "dotenv";
 dotenv.config();
 
-const port = process.env.SERVER_PORT || 5000;
+const port = process.env.PORT || 5000;
 
 const app = express();
 
@@ -30,6 +30,6 @@ app.use("/api/users", usersRoutes);
 app.use(notFound);
 app.use(errorHandler);
 
-app.listen(port, () => {
+app.listen(port as number, "0.0.0.0", () => {
   console.log(`Server is running on port ${port}`);
 });
