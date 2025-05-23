@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
-import asyncHandler from "./asyncHandler";
+import asyncHandler from "../middlewares/asyncHandler";
 import { prisma } from "../config/db";
 import { User } from "../types/users";
 import dotenv from "dotenv";

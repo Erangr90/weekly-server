@@ -5,10 +5,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
-const authRoutes_1 = __importDefault(require("../src/routes/authRoutes"));
-const usersRoutes_1 = __importDefault(require("../src/routes/usersRoutes"));
-const errorsMiddleware_1 = require("../src/middlewares/errorsMiddleware");
-const db_1 = require("../src/config/db");
+const authRoutes_1 = __importDefault(require("./routes/authRoutes"));
+const usersRoutes_1 = __importDefault(require("./routes/usersRoutes"));
+const errorsMiddleware_1 = require("./middlewares/errorsMiddleware");
+const db_1 = require("./config/db");
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
 const port = process.env.SERVER_PORT || 5000;

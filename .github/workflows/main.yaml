@@ -26,12 +26,13 @@ jobs:
       - name: Remove dev files from bundle
         run: |
           rm -rf src
-          rm -rf *.ts
+          rm -rf tsconfig*.json
           rm -rf .git .github
+          find . -name "*.ts" -type f -delete
 
       - name: Create deployment package
         run: |
-          zip -r deploy.zip dist src prisma package.json ecosystem.config.js
+          zip -r deploy.zip dist prisma package.json package-lock.json ecosystem.config.js
 
       - name: Deploy to Elastic Beanstalk
         uses: einaregilsson/beanstalk-deploy@v18
