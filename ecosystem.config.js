@@ -1,7 +1,7 @@
 module.exports = {
     apps: [{
         name: "server",
-        script: "dist/index.js",
+        script: "./dist/index.js",
         instances: 1,
         exec_mode: "fork",
         env: {
