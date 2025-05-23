@@ -31,7 +31,7 @@ jobs:
 
       - name: Create deployment package
         run: |
-          zip -r deploy.zip dist package.json package-lock.json ecosystem.config.js
+          zip -r deploy.zip dist package.json ecosystem.config.js
 
       - name: Deploy to Elastic Beanstalk
         uses: einaregilsson/beanstalk-deploy@v18
