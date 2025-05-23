@@ -20,6 +20,10 @@ app.use(express.json());
 
 connectToDb();
 
+app.get("/", (req, res) => {
+  res.send("Server is up!");
+});
+
 app.use("/api/auth", authRoutes);
 app.use("/api/users", usersRoutes);
 

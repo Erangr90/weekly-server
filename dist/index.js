@@ -18,6 +18,9 @@ app.use((0, cors_1.default)({
 }));
 app.use(express_1.default.json());
 (0, db_1.connectToDb)();
+app.get("/", (req, res) => {
+    res.send("Server is up!");
+});
 app.use("/api/auth", authRoutes_1.default);
 app.use("/api/users", usersRoutes_1.default);
 app.use(errorsMiddleware_1.notFound);

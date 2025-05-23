@@ -23,13 +23,6 @@ jobs:
       - name: Build TypeScript
         run: npm run build
 
-      - name: Remove dev files from bundle
-        run: |
-          rm -rf src
-          rm -rf tsconfig*.json
-          rm -rf .git .github
-          find . -name "*.ts" -type f -delete
-
       - name: Create deployment package
         run: |
           zip -r deploy.zip dist prisma package.json package-lock.json ecosystem.config.js
