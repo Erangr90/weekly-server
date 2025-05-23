@@ -1,16 +1,38 @@
-name: Deploy Next
+name: Deploy Node Server to Elastic Beanstalk
+
 on:
   push:
     branches: ["main"]
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Generate deployment package
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build TypeScript
+        run: npm run build
+
+      - name: Remove dev files from bundle
+        run: |
+          rm -rf src
+          rm -rf *.ts
+          rm -rf .git .github
+
+      - name: Create deployment package
         run: zip -r deploy.zip . -x '*.git*'
 
-      - name: Deploy to EB
+      - name: Deploy to Elastic Beanstalk
         uses: einaregilsson/beanstalk-deploy@v18
         with:
           aws_access_key: ${{ secrets.AWS_ACCESS_KEY }}
