@@ -4,6 +4,8 @@ import path from "path";
 import dotenv from "dotenv";
 dotenv.config();
 
+const templatesPath = path.resolve(__dirname, "templates");
+
 const transporter = nodemailer.createTransport({
   host: process.env.EMAIL_HOST, // smtp.sendgrid.net
   port: Number(process.env.EMAIL_PORT) || 587,
@@ -18,10 +20,10 @@ transporter.use(
   "compile",
   hbs({
     viewEngine: {
-      partialsDir: path.resolve("./src/sendEmail/templates"),
+      partialsDir: templatesPath,
       defaultLayout: false,
     },
-    viewPath: path.resolve("./src/sendEmail/templates"),
+    viewPath: templatesPath,
     extName: ".hbs",
   }),
 );
