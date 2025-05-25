@@ -29,9 +29,11 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
 
   const token = signToken({ id: user.id, fullName: user.fullName });
   return res.status(200).json({
-    id: user.id,
-    fullName: user.fullName,
-    email: user.email,
+    user: {
+      id: user.id,
+      fullName: user.fullName,
+      email: user.email,
+    },
     token,
   });
 });
@@ -65,9 +67,11 @@ export const register = asyncHandler(
     const token = signToken({ id: newUser.id, fullName: newUser.fullName });
 
     res.status(201).json({
-      id: newUser.id,
-      email: newUser.email,
-      fullName: newUser.fullName,
+      user: {
+        id: newUser.id,
+        email: newUser.email,
+        fullName: newUser.fullName,
+      },
       token,
     });
   },
