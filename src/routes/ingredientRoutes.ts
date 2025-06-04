@@ -6,12 +6,18 @@ import {
   updateIngredient,
   deleteIngredient,
   getAllIngredients,
+  getAllIngredPage,
 } from "../controllers/ingredientController";
 const router = express.Router();
-router.route("/").get(protect, getAllIngredients);
+router
+  .route("/")
+  .get(protect, getAllIngredients)
+  .post(protect, isAdmin, createIngredient);
 router
   .route("/:id")
-  .get(protect, isAdmin, getIngredientById)
+  // .get(protect, isAdmin, getIngredientById)
   .put(protect, isAdmin, updateIngredient)
   .delete(protect, isAdmin, deleteIngredient);
+
+router.route("/page").get(protect, isAdmin, getAllIngredPage);
 export default router;

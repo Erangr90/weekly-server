@@ -1,0 +1,21 @@
+apiVersion: skaffold/v4beta3
+kind: Config
+manifests:
+  rawYaml:
+    - ./k8s/*
+build:
+  local:
+    push: false
+  artifacts:
+    - image: grady305/weekly-server
+      context: .
+      docker:
+        dockerfile: Dockerfile.dev
+      sync:
+        manual:
+          - src: "src/**/*.js"
+            dest: .
+          - src: "src/**/*.ts"
+            dest: .
+          - src: "dist/**/*.js"
+            dest: .

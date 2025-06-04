@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api
+  template:
+    metadata:
+      labels:
+        app: api
+    spec:
+      containers:
+        - name: api
+          image: grady305/weekly-server
+          ports:
+            - containerPort: 5000
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          env:
+            - name: NODE_ENV
+              value: production
+            - name: PORT
+              value: "5000"
+            - name: EMAIL_HOST
+              value: smtp.sendgrid.net
+            - name: EMAIL_PORT
+              value: "587"
+            - name: EMAIL_USER
+              value: apikey
+            - name: EMAIL_FROM
+              value: egraydi@gmail.com
+            - name: DATABASE_URL
+              value: "postgresql://neondb_owner:npg_2e6WuQIdFnBa@ep-flat-truth-ab15du0b-pooler.eu-west-2.aws.neon.tech/neondb?sslmode=require"
+            - name: TOKEN_SECRET
+              valueFrom:
+                secretKeyRef:
+                  key: token-secret
+                  name: api-secret
+            - name: EMAIL_PASS
+              valueFrom:
+                secretKeyRef:
+                  key: email-pass
+                  name: api-secret

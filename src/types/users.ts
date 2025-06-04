@@ -5,4 +5,5 @@ export type User = {
   password: string;
   role: string;
   allergyIds: number[];
+  ingredientIds: number[];
 };

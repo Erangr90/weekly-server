@@ -39,6 +39,29 @@ export const getAllergies = asyncHandler(
   },
 );
 
+export const getAllergiesPage = asyncHandler(
+  async (req: Request, res: Response) => {
+    const page = parseInt(req.query.page as string) || 1;
+    const pageSize = 12;
+    const search = (req.query.search as string) || "";
+    const skip = (page - 1) * pageSize;
+
+    const allergies = await prisma.allergy.findMany({
+      skip,
+      take: pageSize,
+      where: {
+        name: { contains: search, mode: "insensitive" },
+      },
+      select: {
+        id: true,
+        name: true,
+      },
+    });
+
+    res.json(allergies);
+  },
+);
+
 export const getAllergyById = asyncHandler(
   async (req: Request, res: Response) => {
     const { id } = req.params;
@@ -73,6 +96,12 @@ export const updateAllergy = asyncHandler(
       res.status(400).json({ message: [...errors] });
       return;
     }
+    const exist = await prisma.allergy.findUnique({
+      where: { name: name.trim() },
+    });
+    if (exist) {
+      throw new Error("האלגריה קיימת במערכת");
+    }
     await prisma.allergy.update({
       where: { id: Number(id) },
       data: {
@@ -84,16 +113,39 @@ export const updateAllergy = asyncHandler(
 );
 
 export const deleteAllergy = asyncHandler(
-  async (res: Response, req: Request) => {
+  async (req: Request, res: Response) => {
     const { id } = req.params;
+    const allergyId = Number(id);
     const allergy = await prisma.allergy.findUnique({
       where: { id: Number(id) },
     });
     if (!allergy) {
       throw new Error("האלגריה לא קיימת במערכת");
     }
+    const affectedUsers = await prisma.user.findMany({
+      where: {
+        allergyIds: {
+          has: allergyId,
+        },
+      },
+      select: {
+        id: true,
+        allergyIds: true,
+      },
+    });
+
+    await Promise.all(
+      affectedUsers.map(({ id, allergyIds }) =>
+        prisma.user.update({
+          where: { id },
+          data: {
+            allergyIds: allergyIds.filter((aid) => aid !== allergyId),
+          },
+        }),
+      ),
+    );
     await prisma.allergy.delete({
-      where: { id: Number(id) },
+      where: { id: allergyId },
     });
     res.status(200).json({ message: "האלגריה נמחקה בהצלחה" });
   },

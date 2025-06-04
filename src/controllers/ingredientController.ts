@@ -84,17 +84,64 @@ export const updateIngredient = asyncHandler(
 );
 
 export const deleteIngredient = asyncHandler(
-  async (res: Response, req: Request) => {
+  async (req: Request, res: Response) => {
     const { id } = req.params;
+    const ingredId = Number(id);
     const ingredient = await prisma.ingredient.findUnique({
-      where: { id: Number(id) },
+      where: { id: ingredId },
     });
     if (!ingredient) {
       throw new Error("המרכיב לא קיים במערכת");
     }
+    const affectedUsers = await prisma.user.findMany({
+      where: {
+        ingredientIds: {
+          has: ingredId,
+        },
+      },
+      select: {
+        id: true,
+        ingredientIds: true,
+      },
+    });
+
+    await Promise.all(
+      affectedUsers.map(({ id, ingredientIds }) =>
+        prisma.user.update({
+          where: { id },
+          data: {
+            ingredientIds: ingredientIds.filter((aid) => aid !== ingredId),
+          },
+        }),
+      ),
+    );
     await prisma.ingredient.delete({
-      where: { id: Number(id) },
+      where: { id: ingredId },
     });
     res.status(200).json({ message: "המרכיב נמחק בהצלחה" });
+  },
+);
+
+export const getAllIngredPage = asyncHandler(
+  async (req: Request, res: Response) => {
+    const page = parseInt(req.query.page as string) || 1;
+    const pageSize = 12;
+    const search = (req.query.search as string) || "";
+    const skip = (page - 1) * pageSize;
+
+    const ingredients = await prisma.ingredient.findMany({
+      skip,
+      take: pageSize,
+      where: {
+        OR: [{ name: { contains: search, mode: "insensitive" } }],
+      },
+      select: {
+        id: true,
+        name: true,
+        // Add other fields you want to include
+      },
+    });
+
+    res.json(ingredients);
   },
 );

@@ -3,11 +3,11 @@ import { protect, isAdmin } from "../middlewares/authMiddleware";
 import {
   createPending,
   getAllPending,
-  getPendingById,
+  // getPendingById,
   deletePending,
   getAllPendingLen,
   approvePending,
-} from "../controllers/pendingIngController";
+} from "../controllers/pendingIngreController";
 const router = express.Router();
 router.route("/len").get(protect, isAdmin, getAllPendingLen);
 router

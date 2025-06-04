@@ -1,12 +1,5 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
-  // output   = "../src/generated/prisma"
 }
 
 datasource db {
@@ -14,32 +7,50 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Role {
-id Int @id @default(autoincrement())
-name String @unique
-}
-
 model User {
-  id       Int     @id @default(autoincrement())
-  email    String  @unique
-  fullName String
-  password String
-  role String @default("USER")
-  allergyIds Int[]
+  id            Int      @id @default(autoincrement())
+  email         String   @unique
+  fullName      String
+  password      String
+  allergyIds    Int[]
   ingredientIds Int[]
+  role          UserRole @default(USER)
 }
 
-model Allergy{
-  id Int @id @default(autoincrement())
+model Allergy {
+  id   Int    @id @default(autoincrement())
   name String @unique
 }
 
-model Ingredient{
-  id Int @id @default(autoincrement())
+model Ingredient {
+  id   Int    @id @default(autoincrement())
   name String @unique
 }
 
 model PendingIng {
-  id Int @id @default(autoincrement())
+  id   Int    @id @default(autoincrement())
   name String @unique
+  userId Int
+}
+
+enum UserRole {
+  ADMIN
+  USER
+}
+
+model Restaurant{
+  id   Int    @id @default(autoincrement())
+  name String @unique
+  email String @unique
+  phone String 
+}
+
+model Dish{
+  id   Int    @id @default(autoincrement())
+  name String @unique
+  price Int
+  restaurantId Int
+  ingredientsIds Int[]
+  image String
+  allergyIds Int[]
 }

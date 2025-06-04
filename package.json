@@ -2,14 +2,14 @@
   "name": "server",
   "version": "1.0.0",
   "description": "",
-  "main": "dist/index.js",
+  "main": "dist/server.js",
   "scripts": {
-    "dev": "ts-node-dev --respawn --transpile-only ./src/index.ts",
+    "dev": "ts-node-dev --respawn --transpile-only ./src/server.ts",
     "build": "run-s build:ts build:templates",
     "build:ts": "tsc",
     "build:templates": "cpx src/sendEmail/templates/**/* dist/sendEmail/templates",
     "start": "pm2-runtime ecosystem.config.js",
-    "start-ts": "node dist/index.js"
+    "start-ts": "node dist/server.js"
   },
   "keywords": [],
   "author": "",

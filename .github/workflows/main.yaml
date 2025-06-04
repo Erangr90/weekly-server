@@ -13,18 +13,3 @@ jobs:
       - run: docker build -t grady305/weekly-server ./
 
       - run: docker push grady305/weekly-server
-
-      - name: Generate deployment package
-        run: zip -r deploy.zip . -x '*.git*'
-
-      - name: Deploy to EB
-        uses: einaregilsson/beanstalk-deploy@v22
-        with:
-          aws_access_key: ${{ secrets.AWS_ACCESS_KEY }}
-          aws_secret_key: ${{ secrets.AWS_SECRET_KEY }}
-          application_name: weekly-server
-          environment_name: Weekly-server-env-1
-          existing_bucket_name: elasticbeanstalk-us-east-1-786009993834
-          region: us-east-1
-          version_label: ${{ github.sha }}
-          deployment_package: deploy.zip

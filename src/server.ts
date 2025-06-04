@@ -4,7 +4,8 @@ import authRoutes from "./routes/authRoutes";
 import usersRoutes from "./routes/usersRoutes";
 import allergyRoutes from "./routes/allergyRoutes";
 import ingredientRoutes from "./routes/ingredientRoutes";
-import pendingRoutes from "./routes/pendingRoutes";
+import pendingIngrRoutes from "./routes/pendingIngrRoutes";
+import restaurantRoutes from "./routes/restaurantRoutes";
 import { notFound, errorHandler } from "./middlewares/errorsMiddleware";
 import { connectToDb } from "./config/db";
 import dotenv from "dotenv";
@@ -27,11 +28,12 @@ app.get("/", (req, res) => {
   res.send("Server is up!");
 });
 
-app.use("/api/auth", authRoutes);
-app.use("/api/users", usersRoutes);
-app.use("/api/allergies", allergyRoutes);
-app.use("/api/ingredients", ingredientRoutes);
-app.use("/api/pending", pendingRoutes);
+app.use("/auth", authRoutes);
+app.use("/users", usersRoutes);
+app.use("/allergies", allergyRoutes);
+app.use("/ingredients", ingredientRoutes);
+app.use("/pending", pendingIngrRoutes);
+app.use("/restaurants", restaurantRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
