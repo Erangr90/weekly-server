@@ -8,49 +8,58 @@ datasource db {
 }
 
 model User {
-  id            Int      @id @default(autoincrement())
-  email         String   @unique
-  fullName      String
-  password      String
-  allergyIds    Int[]
-  ingredientIds Int[]
-  role          UserRole @default(USER)
+  id          Int          @id @default(autoincrement())
+  email       String       @unique
+  fullName    String
+  password    String
+  role        UserRole     @default(USER)
+  pendingIngs PendingIng[]
+  allergies   Allergy[]    @relation("UserAllergies")
+  ingredients Ingredient[] @relation("UserIngredients")
 }
 
 model Allergy {
-  id   Int    @id @default(autoincrement())
-  name String @unique
+  id     Int    @id @default(autoincrement())
+  name   String @unique
+  dishes Dish[] @relation("DishAllergies")
+  users  User[] @relation("UserAllergies")
 }
 
 model Ingredient {
-  id   Int    @id @default(autoincrement())
-  name String @unique
+  id     Int    @id @default(autoincrement())
+  name   String @unique
+  dishes Dish[] @relation("DishIngredients")
+  users  User[] @relation("UserIngredients")
+}
+
+model Dish {
+  id           Int          @id @default(autoincrement())
+  name         String       @unique
+  price        Float
+  restaurantId Int
+  image        String?
+  description  String
+  restaurant   Restaurant   @relation(fields: [restaurantId], references: [id])
+  allergies    Allergy[]    @relation("DishAllergies")
+  ingredients  Ingredient[] @relation("DishIngredients")
+}
+
+model Restaurant {
+  id     Int    @id @default(autoincrement())
+  name   String @unique
+  email  String @unique
+  phone  String
+  dishes Dish[]
 }
 
 model PendingIng {
-  id   Int    @id @default(autoincrement())
-  name String @unique
+  id     Int    @id @default(autoincrement())
+  name   String @unique
   userId Int
+  user   User   @relation(fields: [userId], references: [id])
 }
 
 enum UserRole {
   ADMIN
   USER
-}
-
-model Restaurant{
-  id   Int    @id @default(autoincrement())
-  name String @unique
-  email String @unique
-  phone String 
-}
-
-model Dish{
-  id   Int    @id @default(autoincrement())
-  name String @unique
-  price Int
-  restaurantId Int
-  ingredientsIds Int[]
-  image String
-  allergyIds Int[]
 }

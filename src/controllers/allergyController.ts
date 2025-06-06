@@ -2,12 +2,13 @@ import { NextFunction, Request, Response } from "express";
 import { prisma } from "../config/db";
 import asyncHandler from "../middlewares/asyncHandler";
 import { allergySchema } from "../dto/allergy.dto";
+import { User } from "@prisma/client";
 
 export const createAllergy = asyncHandler(
   async (req: Request, res: Response) => {
     const { name } = req.body;
     const result = allergySchema.safeParse({
-      name: name.trim(),
+      name: name,
     });
     if (!result.success) {
       const errors = [];
@@ -86,7 +87,7 @@ export const updateAllergy = asyncHandler(
       throw new Error("האלגריה לא קיימת במערכת");
     }
     const result = allergySchema.safeParse({
-      name: name.trim(),
+      name: name,
     });
     if (!result.success) {
       const errors = [];
@@ -117,29 +118,21 @@ export const deleteAllergy = asyncHandler(
     const { id } = req.params;
     const allergyId = Number(id);
     const allergy = await prisma.allergy.findUnique({
-      where: { id: Number(id) },
+      where: { id: allergyId },
+      include: { users: true },
     });
     if (!allergy) {
       throw new Error("האלגריה לא קיימת במערכת");
     }
-    const affectedUsers = await prisma.user.findMany({
-      where: {
-        allergyIds: {
-          has: allergyId,
-        },
-      },
-      select: {
-        id: true,
-        allergyIds: true,
-      },
-    });
 
     await Promise.all(
-      affectedUsers.map(({ id, allergyIds }) =>
+      allergy.users.map((user) =>
         prisma.user.update({
-          where: { id },
+          where: { id: user.id },
           data: {
-            allergyIds: allergyIds.filter((aid) => aid !== allergyId),
+            allergies: {
+              disconnect: { id: allergyId },
+            },
           },
         }),
       ),

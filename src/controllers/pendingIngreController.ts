@@ -8,7 +8,7 @@ export const createPending = asyncHandler(
   async (req: AuthenticatedRequest, res: Response) => {
     const { name } = req.body;
     const result = ingredientSchema.safeParse({
-      name: name.trim(),
+      name: name,
     });
     if (!result.success) {
       const errors = [];
@@ -114,8 +114,10 @@ export const approvePending = asyncHandler(
     await prisma.user.update({
       where: { id: pending!.userId },
       data: {
-        ingredientIds: {
-          push: ingredient.id,
+        ingredients: {
+          connect: {
+            id: ingredient.id,
+          },
         },
       },
     });

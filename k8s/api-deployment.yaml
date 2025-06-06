@@ -38,7 +38,10 @@ spec:
             - name: EMAIL_FROM
               value: egraydi@gmail.com
             - name: DATABASE_URL
-              value: "postgresql://neondb_owner:npg_2e6WuQIdFnBa@ep-flat-truth-ab15du0b-pooler.eu-west-2.aws.neon.tech/neondb?sslmode=require"
+              valueFrom:
+                secretKeyRef:
+                  key: database-url
+                  name: api-secret
             - name: TOKEN_SECRET
               valueFrom:
                 secretKeyRef:

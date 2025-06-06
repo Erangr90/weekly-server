@@ -1,13 +1,21 @@
 import express from "express";
 import {
-  getAllRestaurants,
+  getAllRestaurantsPage,
   createRestaurant,
+  updateRestaurant,
+  deleteRestaurant,
+  getAllRestaurants,
 } from "../controllers/restaurantController";
 import { protect, isAdmin } from "../middlewares/authMiddleware";
 const router = express.Router();
 router
   .route("/")
-  .get(protect, isAdmin, getAllRestaurants)
-  .post(protect, isAdmin, createRestaurant);
+  .post(protect, isAdmin, createRestaurant)
+  .get(protect, isAdmin, getAllRestaurants);
+router
+  .route("/:id")
+  .put(protect, isAdmin, updateRestaurant)
+  .delete(protect, isAdmin, deleteRestaurant);
+router.route("/page").get(protect, isAdmin, getAllRestaurantsPage);
 
 export default router;

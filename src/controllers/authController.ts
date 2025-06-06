@@ -10,8 +10,8 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
   const { email, password } = req.body;
 
   const result = loginUserSchema.safeParse({
-    email: email.trim(),
-    password: password.trim(),
+    email: email,
+    password: password,
   });
   if (!result.success) {
     const errors = [];
@@ -22,7 +22,18 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
     return;
   }
 
-  const user = await prisma.user.findUnique({ where: { email: email.trim() } });
+  const user = await prisma.user.findUnique({
+    where: { email: email.trim() },
+    select: {
+      id: true,
+      fullName: true,
+      email: true,
+      allergies: true,
+      role: true,
+      ingredients: true,
+      password: true,
+    },
+  });
   if (!user) {
     throw new Error("המשתמש לא קיים במערכת");
   }
@@ -37,9 +48,9 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
       id: user.id,
       fullName: user.fullName,
       email: user.email,
-      allergyIds: user.allergyIds,
+      allergies: user.allergies,
       role: user.role,
-      ingredientIds: user.ingredientIds,
+      ingredients: user.ingredients,
     },
     token,
   });
@@ -49,9 +60,9 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
   const { email, password, fullName, allergyIds } = req.body;
 
   const result = createUserSchema.safeParse({
-    email: email.trim(),
-    password: password.trim(),
-    fullName: fullName.trim(),
+    email: email,
+    password: password,
+    fullName: fullName,
   });
   if (!result.success) {
     const errors = [];
@@ -73,7 +84,17 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
       email: email.trim(),
       password: hashedPassword,
       fullName: fullName.trim(),
-      allergyIds,
+      allergies: {
+        connect: allergyIds.map((id: number) => ({ id })),
+      },
+    },
+    select: {
+      id: true,
+      fullName: true,
+      email: true,
+      role: true,
+      allergies: true,
+      ingredients: true,
     },
   });
   const token = signToken({ id: newUser.id, fullName: newUser.fullName });
@@ -83,9 +104,9 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
       id: newUser.id,
       email: newUser.email,
       fullName: newUser.fullName,
-      allergyIds: newUser.allergyIds,
+      allergies: newUser.allergies,
       role: newUser.role,
-      ingredientIds: newUser.ingredientIds,
+      ingredients: newUser.ingredients,
     },
     token,
   });

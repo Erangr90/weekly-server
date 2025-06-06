@@ -7,7 +7,7 @@ export const createIngredient = asyncHandler(
   async (req: Request, res: Response) => {
     const { name } = req.body;
     const result = ingredientSchema.safeParse({
-      name: name.trim(),
+      name: name,
     });
     if (!result.success) {
       const errors = [];
@@ -63,7 +63,7 @@ export const updateIngredient = asyncHandler(
       throw new Error("האלגריה לא קיימת במערכת");
     }
     const result = ingredientSchema.safeParse({
-      name: name.trim(),
+      name: name,
     });
     if (!result.success) {
       const errors = [];
@@ -89,28 +89,20 @@ export const deleteIngredient = asyncHandler(
     const ingredId = Number(id);
     const ingredient = await prisma.ingredient.findUnique({
       where: { id: ingredId },
+      include: { users: true },
     });
     if (!ingredient) {
       throw new Error("המרכיב לא קיים במערכת");
     }
-    const affectedUsers = await prisma.user.findMany({
-      where: {
-        ingredientIds: {
-          has: ingredId,
-        },
-      },
-      select: {
-        id: true,
-        ingredientIds: true,
-      },
-    });
 
     await Promise.all(
-      affectedUsers.map(({ id, ingredientIds }) =>
+      ingredient.users.map((user) =>
         prisma.user.update({
-          where: { id },
+          where: { id: user.id },
           data: {
-            ingredientIds: ingredientIds.filter((aid) => aid !== ingredId),
+            ingredients: {
+              disconnect: { id: ingredId },
+            },
           },
         }),
       ),

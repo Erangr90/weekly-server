@@ -22,8 +22,6 @@ export const getAllUsers = asyncHandler(async (req: Request, res: Response) => {
       fullName: true,
       email: true,
       role: true,
-      ingredientIds: true,
-      allergyIds: true,
       // Add other fields you want to include
     },
   });
@@ -51,7 +49,17 @@ export const updateUserLike = asyncHandler(
         id: Number(id),
       },
       data: {
-        ingredientIds: ids,
+        ingredients: {
+          connect: ids.map((id: number) => ({ id })),
+        },
+      },
+      select: {
+        id: true,
+        fullName: true,
+        email: true,
+        role: true,
+        ingredients: true,
+        allergies: true,
       },
     });
     res.status(200).json({
@@ -59,8 +67,8 @@ export const updateUserLike = asyncHandler(
         id: updatedUser.id,
         email: updatedUser.email,
         fullName: updatedUser.fullName,
-        ingredientIds: updatedUser.ingredientIds,
-        allergyIds: updatedUser.allergyIds,
+        ingredients: updatedUser.ingredients,
+        allergies: updatedUser.allergies,
         role: updatedUser.role,
       },
       message: "העדפות עודכנו בהצלחה",
@@ -88,7 +96,17 @@ export const updateUserAllergy = asyncHandler(
         id: Number(id),
       },
       data: {
-        allergyIds: ids,
+        allergies: {
+          set: ids.map((id: number) => ({ id })),
+        },
+      },
+      select: {
+        id: true,
+        fullName: true,
+        email: true,
+        role: true,
+        ingredients: true,
+        allergies: true,
       },
     });
     res.status(200).json({
@@ -96,8 +114,8 @@ export const updateUserAllergy = asyncHandler(
         id: updatedUser.id,
         email: updatedUser.email,
         fullName: updatedUser.fullName,
-        ingredientIds: updatedUser.ingredientIds,
-        allergyIds: updatedUser.allergyIds,
+        ingredients: updatedUser.ingredients,
+        allergies: updatedUser.allergies,
         role: updatedUser.role,
       },
       message: "הרגישויות עודכנו בהצלחה",
@@ -163,9 +181,8 @@ export const getUserIngr = asyncHandler(async (req: Request, res: Response) => {
       id: Number(id),
     },
     select: {
-      ingredientIds: true,
-      // Add other fields you want to include
+      ingredients: true,
     },
   });
-  res.json(user);
+  res.json(user?.ingredients);
 });
