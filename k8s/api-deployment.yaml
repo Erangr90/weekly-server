@@ -52,3 +52,18 @@ spec:
                 secretKeyRef:
                   key: email-pass
                   name: api-secret
+            - name: CLOUDINARY_CLOUD_NAME
+              valueFrom:
+                secretKeyRef:
+                  key: cloudinary-name
+                  name: api-secret
+            - name: CLOUDINARY_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  key: cloudinary-api-key
+                  name: api-secret
+            - name: CLOUDINARY_API_SECRET
+              valueFrom:
+                secretKeyRef:
+                  key: cloudinary-api-secret
+                  name: api-secret

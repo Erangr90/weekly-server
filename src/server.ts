@@ -9,6 +9,7 @@ import ingredientRoutes from "./routes/ingredientRoutes";
 import pendingIngrRoutes from "./routes/pendingIngrRoutes";
 import restaurantRoutes from "./routes/restaurantRoutes";
 import dishesRoutes from "./routes/dishRoutes";
+import uploadRoutes from "./routes/uploadRoutes";
 // Middlewares
 import { notFound, errorHandler } from "./middlewares/errorsMiddleware";
 // Config
@@ -40,6 +41,7 @@ app.use("/ingredients", ingredientRoutes);
 app.use("/pending", pendingIngrRoutes);
 app.use("/restaurants", restaurantRoutes);
 app.use("/dishes", dishesRoutes);
+app.use("/upload", uploadRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
