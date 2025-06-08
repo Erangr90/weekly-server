@@ -42,7 +42,8 @@ export const getAllergies = asyncHandler(
 
 export const getAllergiesPage = asyncHandler(
   async (req: Request, res: Response) => {
-    const page = parseInt(req.query.page as string) || 1;
+    let page = parseInt(req.query.page as string) || 1;
+    if (page < 1) page = 1;
     const pageSize = 12;
     const search = (req.query.search as string) || "";
     const skip = (page - 1) * pageSize;

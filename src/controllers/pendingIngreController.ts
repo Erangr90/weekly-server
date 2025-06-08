@@ -68,18 +68,6 @@ export const getAllPendingLen = asyncHandler(
   },
 );
 
-//   async (req: Request, res: Response) => {
-//     const { id } = req.params;
-//     const ingredient = await prisma.pendingIng.findUnique({
-//       where: { id: Number(id) },
-//     });
-//     if (!ingredient) {
-//       throw new Error("המרכיב לא קיים במערכת");
-//     }
-//     res.status(200).json(ingredient);
-//   },
-// );
-
 export const deletePending = asyncHandler(
   async (req: Request, res: Response) => {
     const { id } = req.params;

@@ -50,7 +50,7 @@ export const updateUserLike = asyncHandler(
       },
       data: {
         ingredients: {
-          connect: ids.map((id: number) => ({ id })),
+          set: ids.map((id: number) => ({ id })),
         },
       },
       select: {

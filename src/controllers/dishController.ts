@@ -6,8 +6,9 @@ import { AuthenticatedRequest } from "../types/request";
 
 export const getDishesPage = asyncHandler(
   async (req: Request, res: Response) => {
-    const page = parseInt(req.query.page as string) || 1;
-    const pageSize = 12;
+    let page = parseInt(req.query.page as string) || 1;
+    if (page < 0) page = 1;
+    const pageSize = 8;
     const search = (req.query.search as string) || "";
     const skip = (page - 1) * pageSize;
 
@@ -18,6 +19,11 @@ export const getDishesPage = asyncHandler(
         OR: [
           { name: { contains: search, mode: "insensitive" } },
           { description: { contains: search, mode: "insensitive" } },
+          {
+            restaurant: {
+              name: { contains: search, mode: "insensitive" },
+            },
+          },
         ],
       },
       select: {
@@ -26,6 +32,14 @@ export const getDishesPage = asyncHandler(
         description: true,
         price: true,
         image: true,
+        ingredients: true,
+        allergies: true,
+        restaurant: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
       },
     });
 
@@ -35,6 +49,11 @@ export const getDishesPage = asyncHandler(
 
 export const getUserDishes = asyncHandler(
   async (req: AuthenticatedRequest, res: Response) => {
+    let page = parseInt(req.query.page as string) || 1;
+    if (page < 1) page = 1;
+    const pageSize = 8;
+    const search = (req.query.search as string) || "";
+    const skip = (page - 1) * pageSize;
     // Get user's allergies ids
     const userAllergyIds = req.user!.allergies?.map((allergy) => allergy.id);
     let dishes = null;
@@ -43,6 +62,8 @@ export const getUserDishes = asyncHandler(
       // - include ALL of the user's allergies
       // - include NONE of the user's ingredients
       dishes = await prisma.dish.findMany({
+        skip,
+        take: pageSize,
         where: {
           // Ingredients must NOT contain any of the user's ingredients
           ingredients: {
@@ -60,10 +81,36 @@ export const getUserDishes = asyncHandler(
               some: { id: allergyId },
             },
           })),
+          OR: [
+            { name: { contains: search, mode: "insensitive" } },
+            { description: { contains: search, mode: "insensitive" } },
+            {
+              restaurant: {
+                name: { contains: search, mode: "insensitive" },
+              },
+            },
+          ],
+        },
+        select: {
+          id: true,
+          name: true,
+          description: true,
+          price: true,
+          image: true,
+          ingredients: true,
+          allergies: true,
+          restaurant: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
         },
       });
     } else {
       dishes = await prisma.dish.findMany({
+        skip,
+        take: pageSize,
         where: {
           // Must include at least one allergy from the user's allergies
           allergies: {
@@ -83,6 +130,30 @@ export const getUserDishes = asyncHandler(
                   id: req.user!.id,
                 },
               },
+            },
+          },
+          OR: [
+            { name: { contains: search, mode: "insensitive" } },
+            { description: { contains: search, mode: "insensitive" } },
+            {
+              restaurant: {
+                name: { contains: search, mode: "insensitive" },
+              },
+            },
+          ],
+        },
+        select: {
+          id: true,
+          name: true,
+          description: true,
+          price: true,
+          image: true,
+          ingredients: true,
+          allergies: true,
+          restaurant: {
+            select: {
+              id: true,
+              name: true,
             },
           },
         },
@@ -141,4 +212,70 @@ export const createDish = asyncHandler(async (req: Request, res: Response) => {
     },
   });
   res.status(201).json({ message: "המנה התווספה בהצלחה" });
+});
+
+export const getDishById = asyncHandler(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const dish = await prisma.dish.findUnique({
+    where: { id: Number(id) },
+    include: {
+      allergies: true,
+      ingredients: true,
+      restaurant: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+    },
+  });
+  if (!dish) {
+    throw new Error("המנה לא קיימת במערכת");
+  }
+  res.status(200).json(dish);
+});
+
+export const updateDish = asyncHandler(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const {
+    name,
+    price,
+    restaurantId,
+    image,
+    description,
+    allergyIds,
+    ingredientIds,
+  } = req.body;
+
+  const result = dishSchema.safeParse({
+    name: name,
+    price: price,
+    description: description,
+  });
+  if (!result.success) {
+    const errors = [];
+    for (const error of result.error.errors) {
+      errors.push(error.message);
+    }
+    res.status(400).json({ message: [...errors] });
+    return;
+  }
+
+  await prisma.dish.update({
+    where: { id: Number(id) },
+    data: {
+      name: name.trim(),
+      price: price,
+      description: description.trim(),
+      image: image.trim(),
+      restaurantId: restaurantId,
+      allergies: {
+        set: allergyIds.map((id: number) => ({ id })),
+      },
+      ingredients: {
+        set: ingredientIds.map((id: number) => ({ id })),
+      },
+    },
+  });
+  res.status(200).json({ message: "המנה עודכנה בהצלחה" });
 });
