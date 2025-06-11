@@ -5,21 +5,15 @@ metadata:
   annotations:
     nginx.ingress.kubernetes.io/use-regex: "true"
     nginx.ingress.kubernetes.io/rewrite-target: /$1
-    cert-manager.io/cluster-issuer: "letsencrypt-prod"
 spec:
   ingressClassName: nginx
   rules:
-    - host: test-5587.online
-      http:
-        paths:
-          - path: /api/?(.*)
-            pathType: ImplementationSpecific
-            backend:
-              service:
-                name: api-cluster-ip
-                port:
-                  number: 5000
-  tls:
-    - hosts:
-        - test-5587.online
-      secretName: test-5587-tls
+    http:
+      paths:
+        - path: /api/?(.*)
+          pathType: ImplementationSpecific
+          backend:
+            service:
+              name: api-cluster-ip
+              port:
+                number: 5000
