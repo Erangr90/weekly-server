@@ -37,4 +37,4 @@ jobs:
       - name: Apply
         run: |-
           kubectl apply -f k8s
-          kubectl set image deployments/server-deployment server=grady305/weekly-server:${{ env.SHA }}
+          kubectl set image deployments/api-deployment server=grady305/weekly-server:${{ env.SHA }}
