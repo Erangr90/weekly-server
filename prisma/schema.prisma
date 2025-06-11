@@ -16,6 +16,7 @@ model User {
   pendingIngs PendingIng[]
   allergies   Allergy[]    @relation("UserAllergies")
   ingredients Ingredient[] @relation("UserIngredients")
+  @@index([email])
 }
 
 model Allergy {
@@ -23,6 +24,7 @@ model Allergy {
   name   String @unique
   dishes Dish[] @relation("DishAllergies")
   users  User[] @relation("UserAllergies")
+  @@index([name])
 }
 
 model Ingredient {
@@ -30,6 +32,7 @@ model Ingredient {
   name   String @unique
   dishes Dish[] @relation("DishIngredients")
   users  User[] @relation("UserIngredients")
+  @@index([name])
 }
 
 model Dish {
@@ -42,6 +45,7 @@ model Dish {
   restaurant   Restaurant   @relation(fields: [restaurantId], references: [id])
   allergies    Allergy[]    @relation("DishAllergies")
   ingredients  Ingredient[] @relation("DishIngredients")
+  @@index([name])
 }
 
 model Restaurant {
@@ -50,6 +54,7 @@ model Restaurant {
   email  String @unique
   phone  String
   dishes Dish[]
+  @@index([name])
 }
 
 model PendingIng {
@@ -57,6 +62,7 @@ model PendingIng {
   name   String @unique
   userId Int
   user   User   @relation(fields: [userId], references: [id])
+  @@index([name])
 }
 
 enum UserRole {
