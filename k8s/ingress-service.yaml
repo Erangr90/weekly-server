@@ -19,6 +19,7 @@ spec:
       http:
         paths:
           - path: /api/?(.*)
+            pathType: ImplementationSpecific
             backend:
               service:
                 name: api-cluster-ip
@@ -28,6 +29,7 @@ spec:
       http:
         paths:
           - path: /api/?(.*)
+            pathType: ImplementationSpecific
             backend:
               service:
                 name: api-cluster-ip
