@@ -1,0 +1,13 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: test-5587-online-tls
+spec:
+  secretName: test-5587-online
+  issuerRef:
+    name: letsencrypt
+    kind: ClusterIssuer
+  commonName: test-5587.online
+  dnsNames:
+    - test-5587.online
+    - www.test-5587.online

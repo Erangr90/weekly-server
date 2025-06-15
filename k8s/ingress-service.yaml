@@ -3,24 +3,33 @@ kind: Ingress
 metadata:
   name: ingress-service
   annotations:
+    kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/use-regex: "true"
     nginx.ingress.kubernetes.io/rewrite-target: /$1
-    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
     cert-manager.io/cluster-issuer: "letsencrypt"
 spec:
-  ingressClassName: nginx
+  tls:
+    - hosts:
+        - test-5587.online
+        - www.test-5587.online
+      secretName: test-5587-online
   rules:
     - host: test-5587.online
       http:
         paths:
           - path: /api/?(.*)
-            pathType: ImplementationSpecific
             backend:
               service:
                 name: api-cluster-ip
                 port:
                   number: 5000
-  tls:
-    - hosts:
-        - test-5587.online
-      secretName: test-5587-online-tls
+    - host: www.test-5587.online
+      http:
+        paths:
+          - path: /api/?(.*)
+            backend:
+              service:
+                name: api-cluster-ip
+                port:
+                  number: 5000
