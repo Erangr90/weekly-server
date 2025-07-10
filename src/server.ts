@@ -14,6 +14,7 @@ import uploadRoutes from "./routes/uploadRoutes";
 import { notFound, errorHandler } from "./middlewares/errorsMiddleware";
 // Config
 import { connectToDb } from "./config/db";
+import { setupSwagger } from "./config/swagger";
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -42,6 +43,7 @@ app.use("/pending", pendingIngrRoutes);
 app.use("/restaurants", restaurantRoutes);
 app.use("/dishes", dishesRoutes);
 app.use("/upload", uploadRoutes);
+setupSwagger(app);
 
 app.use(notFound);
 app.use(errorHandler);

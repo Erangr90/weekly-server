@@ -2,7 +2,7 @@ apiVersion: skaffold/v4beta3
 kind: Config
 manifests:
   rawYaml:
-    - ./k8s/*
+    - ./k8s-dev/*
 build:
   local:
     push: false

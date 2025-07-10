@@ -6,6 +6,78 @@ import { signToken } from "../utils/jwt";
 import { createUserSchema, loginUserSchema } from "../dto/users.dto";
 import { sendVerificationEmail } from "../sendEmail/mailer";
 
+/**
+ * @swagger
+ * /auth/login:
+ *   post:
+ *     summary: Log in a user
+ *     tags:
+ *       - Auth
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - password
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *               password:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Successful login
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 user:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                     fullName:
+ *                       type: string
+ *                     email:
+ *                       type: string
+ *                     allergies:
+ *                       type: array
+ *                       items:
+ *                         type: string
+ *                     role:
+ *                       type: string
+ *                     ingredients:
+ *                       type: array
+ *                       items:
+ *                         type: string
+ *                 token:
+ *                   type: string
+ *       400:
+ *         description: Validation errors | wrong email or password
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *       500:
+ *         description: Server error or incorrect credentials
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ */
 export const login = asyncHandler(async (req: Request, res: Response) => {
   const { email, password } = req.body;
 
@@ -56,6 +128,102 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
   });
 });
 
+/**
+ * @swagger
+ * /auth/register:
+ *   post:
+ *     summary: Register a new user
+ *     tags:
+ *       - Auth
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - password
+ *               - fullName
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: newuser@example.com
+ *               password:
+ *                 type: string
+ *                 example: strongpassword123
+ *               fullName:
+ *                 type: string
+ *                 example: Jane Doe
+ *               allergyIds:
+ *                 type: array
+ *                 items:
+ *                   type: integer
+ *                 example: [1, 3]
+ *     responses:
+ *       201:
+ *         description: User successfully registered
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 user:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                     email:
+ *                       type: string
+ *                       example: newuser@example.com
+ *                     fullName:
+ *                       type: string
+ *                       example: Jane Doe
+ *                     role:
+ *                       type: string
+ *                       example: user
+ *                     allergies:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           id:
+ *                             type: integer
+ *                             example: 1
+ *                           name:
+ *                             type: string
+ *                             example: Gluten
+ *                     ingredients:
+ *                       type: array
+ *                       items:
+ *                         type: string
+ *                 token:
+ *                   type: string
+ *                   example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+ *       400:
+ *         description: Validation errors | Email already exists
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   example: ["Email is invalid", "Password must be at least 6 characters"]
+ *       500:
+ *         description: User already exists or server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: המשתמש קיים במערכת
+ */
 export const register = asyncHandler(async (req: Request, res: Response) => {
   const { email, password, fullName, allergyIds } = req.body;
 
@@ -112,6 +280,48 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
   });
 });
 
+/**
+ * @swagger
+ * /auth/verifyCode:
+ *   post:
+ *     summary: Send a verification code to the user's email
+ *     tags:
+ *       - Auth
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: user@example.com
+ *     responses:
+ *       200:
+ *         description: Verification code sent successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 code:
+ *                   type: string
+ *                   example: "348921"
+ *       500:
+ *         description: User already exists or email sending failed
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: המשתמש קיים במערכת
+ */
 export const verifyCode = asyncHandler(async (req: Request, res: Response) => {
   const { email } = req.body;
   const existsUser = await prisma.user.findUnique({
@@ -126,6 +336,52 @@ export const verifyCode = asyncHandler(async (req: Request, res: Response) => {
   res.status(200).json({ code });
 });
 
+/**
+ * @swagger
+ * /auth/resetPassword:
+ *   post:
+ *     summary: Reset a user's password
+ *     tags:
+ *       - Auth
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - password
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: user@example.com
+ *               password:
+ *                 type: string
+ *                 example: NewStrongPassword123
+ *     responses:
+ *       200:
+ *         description: Password reset successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: הסיסמא שונתה בהצלחה
+ *       500:
+ *         description: User not found or server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: המשתמש לא קיים במערכת
+ */
 export const resetPassword = asyncHandler(
   async (req: Request, res: Response) => {
     const { email, password } = req.body;
@@ -144,6 +400,49 @@ export const resetPassword = asyncHandler(
     res.status(200).json({ message: "הסיסמא שונתה בהצלחה" });
   },
 );
+
+/**
+ * @swagger
+ * /auth/verifyEmail:
+ *   post:
+ *     summary: Send a verification code to an existing user's email
+ *     tags:
+ *       - Auth
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: existinguser@example.com
+ *     responses:
+ *       200:
+ *         description: Verification code sent successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 code:
+ *                   type: string
+ *                   example: "573920"
+ *       500:
+ *         description: User not found or email sending failed
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: המשתמש לא קיים במערכת
+ */
 export const verifyEmail = asyncHandler(async (req: Request, res: Response) => {
   const { email } = req.body;
   const user = await prisma.user.findUnique({ where: { email: email.trim() } });

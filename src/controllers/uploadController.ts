@@ -8,6 +8,57 @@ interface MulterRequest extends Request {
   file: Express.Multer.File;
 }
 
+/**
+ * @swagger
+ * /image:
+ *   post:
+ *     summary: Admin Upload an image, convert it to WebP, and get the hosted URL
+ *     tags:
+ *       - Upload
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               image:
+ *                 type: string
+ *                 format: binary
+ *                 description: The image file to upload
+ *     responses:
+ *       200:
+ *         description: Image uploaded and converted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 url:
+ *                   type: string
+ *                   format: uri
+ *                   example: https://res.cloudinary.com/yourcloud/image/upload/v123456/weekly/abc123.webp
+ *       400:
+ *         description: No image file was provided in the request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: No image provided
+ *       500:
+ *         description: Server error occurred during image processing or upload
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Internal server error
+ */
 export const uploadImage = asyncHandler(async (req: Request, res: Response) => {
   const multerReq = req as MulterRequest;
 
