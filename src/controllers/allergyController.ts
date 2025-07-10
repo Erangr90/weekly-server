@@ -371,7 +371,7 @@ export const updateAllergy = asyncHandler(
 
 /**
  * @swagger
- * /api/allergies/{id}:
+ * /allergies/{id}:
  *   delete:
  *     summary: Admin Delete an allergy by ID and remove it from all associated users
  *     tags:

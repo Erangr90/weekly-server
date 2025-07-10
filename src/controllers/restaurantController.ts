@@ -90,7 +90,7 @@ export const getAllRestaurantsPage = asyncHandler(
 
 /**
  * @swagger
- * /api/restaurants:
+ * /restaurants:
  *   get:
  *     summary: Admin Get a list of all restaurants (id and name only)
  *     tags:
